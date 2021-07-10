@@ -50,9 +50,17 @@
 git clone https://github.com/nacos-group/nacos-docker.git
 cd nacos-docker
 
-# 单机模式 Derby
+# 单机模式 Derby 
 docker-compose -f example/standalone-derby.yaml up
 ```
+
+- 注意： Mac 和Wins docker desktop 已经帮我们集成了 `docker-compose` 所以我们可以通过yaml的形式直接使用
+
+  ```bash
+  ## 通过一下方式可以检查 docker-compose 版本或者是否安装
+  mac@wxw example % docker-compose -v
+  docker-compose version 1.28.5, build c4eb3a1f
+  ```
 
 查看docker 启动的应用容器
 
@@ -90,8 +98,6 @@ docker-compose -f example/standalone-derby.yaml up
 #### 2. 基于openfeign实现服务调用
 
 #### 3. 基于dubbp 实现服务调用
-
-
 
 ### 问题
 
