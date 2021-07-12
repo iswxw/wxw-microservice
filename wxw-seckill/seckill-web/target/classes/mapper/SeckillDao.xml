@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxw.dao.SecKillDao">
+  <resultMap id="BaseResultMap" type="com.wxw.domain.SecKill">
+    <id column="seckill_id" jdbcType="BIGINT" property="seckillId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="number" jdbcType="INTEGER" property="number" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="version" jdbcType="INTEGER" property="version" />
+  </resultMap>
+
+</mapper>

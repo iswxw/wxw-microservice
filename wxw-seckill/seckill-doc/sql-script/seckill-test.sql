@@ -5,24 +5,37 @@ CREATE DATABASE `seckill-test`;
 -- 创建表
 use seckill-test;
 
--- `seckill-test`.t_order 订单表
-CREATE TABLE `t_order` (
-   `order_id` int NOT NULL AUTO_INCREMENT COMMENT '订单ID',
-   `order_name` varchar(100)  DEFAULT '' COMMENT '订单名称',
-   `order_description` varchar(200)  DEFAULT NULL COMMENT '订单描述',
-   `sku_id` int DEFAULT '0' COMMENT '商品Id',
-   `create_time` datetime DEFAULT NULL COMMENT '创建订单时间',
-   PRIMARY KEY (`order_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4  COMMENT='订单表';
+-- 创建 秒杀库存表
+DROP TABLE IF EXISTS `sec_kill`;
 
--- `seckill-test`.t_stock definition
+CREATE TABLE `sec_kill` (
+   `seckill_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '商品库存id',
+   `name` varchar(120) NOT NULL COMMENT '商品名称',
+   `number` int(11) NOT NULL COMMENT '库存数量',
+   `start_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '秒杀开启时间',
+   `end_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '秒杀结束时间',
+   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `version` int(11) NOT NULL COMMENT '版本号',
+   PRIMARY KEY (`seckill_id`),
+   KEY `idx_start_time` (`start_time`),
+   KEY `idx_end_time` (`end_time`),
+   KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='秒杀库存表';
 
-CREATE TABLE `t_stock` (
-   `stock_id` int NOT NULL AUTO_INCREMENT COMMENT '库存Id',
-   `sku_id` int DEFAULT '0' COMMENT '商品Id',
-   `stock_name` varchar(100)  DEFAULT '' COMMENT '库存名称',
-   `stock_count` int DEFAULT '0' COMMENT '库存剩余数量',
-   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-   PRIMARY KEY (`stock_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4  COMMENT='库存';
+-- 写入测试数据
+insert  into `t_sec_kill`(`seckill_id`,`name`,`number`,`start_time`,`end_time`,`create_time`,`version`) values (1000,'1000元秒杀iphone8',100,'2018-05-10 15:31:53','2018-05-10 15:31:53','2018-05-10 15:31:53',0),(1001,'500元秒杀ipad2',100,'2018-05-10 15:31:53','2018-05-10 15:31:53','2018-05-10 15:31:53',0),(1002,'300元秒杀小米4',100,'2018-05-10 15:31:53','2018-05-10 15:31:53','2018-05-10 15:31:53',0),(1003,'200元秒杀红米note',100,'2018-05-10 15:31:53','2018-05-10 15:31:53','2018-05-10 15:31:53',0);
+
+
+-- 创建 秒杀成功明细表
+DROP TABLE IF EXISTS `t_success_killed`;
+
+CREATE TABLE `t_success_killed` (
+  `seckill_id` bigint(20) NOT NULL COMMENT '秒杀商品id',
+  `user_id` bigint(20) NOT NULL COMMENT '用户Id',
+  `state` tinyint(4) NOT NULL COMMENT '状态标示：-1指无效，0指成功，1指已付款',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`seckill_id`,`user_id`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='秒杀成功明细表';
+
 

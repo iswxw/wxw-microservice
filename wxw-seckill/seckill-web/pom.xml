@@ -18,7 +18,7 @@
 
     <dependencies>
         <!--eureka-->
-        <dependency>
+     <!--   <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
             <exclusions>
@@ -31,7 +31,7 @@
                     <groupId>org.hibernate.validator</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency>-->
         <!--redis-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

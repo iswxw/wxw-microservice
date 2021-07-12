@@ -5,6 +5,6 @@ package com.wxw.service;
  * @desc:
  * @date: 2021/7/12
  */
-public interface OrderService {
+public interface GrabOrderService {
 
 }
