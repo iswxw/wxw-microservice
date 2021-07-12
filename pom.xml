@@ -23,13 +23,13 @@
         <spring.boot.version>2.5.2</spring.boot.version>
         <spring.cloud.version>2020.0.3</spring.cloud.version>
         <cloud.alibaba.version>2.2.5.RELEASE</cloud.alibaba.version>
-        <mysql.version>8.0.15</mysql.version>
         <!-- Maven Plugin Versions -->
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
+        <mysql.version>8.0.25</mysql.version>
     </properties>
 
     <!--管理子模块依赖版本-->
@@ -90,6 +90,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
         <!--actuator-->
         <dependency>
