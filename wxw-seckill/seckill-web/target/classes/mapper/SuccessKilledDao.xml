@@ -7,4 +7,7 @@
     <result column="state" jdbcType="TINYINT" property="state" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
+    <delete id="deleteByKillId">
+      DELETE FROM `seckill-test`.t_success_killed WHERE seckill_id=#{secKillId}
+    </delete>
 </mapper>

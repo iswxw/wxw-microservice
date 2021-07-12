@@ -8,4 +8,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface SuccessKilledDao extends BaseMapper<SuccessKilled> {
 
+    void deleteByKillId(long secKillId);
 }

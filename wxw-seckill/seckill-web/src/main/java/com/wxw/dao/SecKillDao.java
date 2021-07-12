@@ -8,4 +8,9 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface SecKillDao extends BaseMapper<SecKill> {
 
+    void updateNumberBySecKillId(long secKillId);
+
+    Long queryNumberBySeckill(long killId);
+
+    void updateNumberByKillId(long killId);
 }

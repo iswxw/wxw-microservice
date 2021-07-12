@@ -11,4 +11,15 @@
     <result column="version" jdbcType="INTEGER" property="version" />
   </resultMap>
 
+  <update id="updateNumberBySecKillId">
+    UPDATE `seckill-test`.t_sec_kill SET number = 5 WHERE seckill_id= #{secKillId}
+  </update>
+  <update id="updateNumberByKillId">
+    UPDATE `seckill-test`.t_sec_kill SET number= number - 1 WHERE seckill_id = #{killId}
+  </update>
+
+  <select id="queryNumberBySeckill" resultType="java.lang.Long">
+      SELECT number FROM `seckill-test`.t_sec_kill WHERE seckill_id=#{killId}
+    </select>
+
 </mapper>
