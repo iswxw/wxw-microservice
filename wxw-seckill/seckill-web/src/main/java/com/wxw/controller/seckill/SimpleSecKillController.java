@@ -31,19 +31,27 @@ public class SimpleSecKillController {
     private SecKillService secKillService;
 
     /**
-     * 下单接口
-     * 秒杀一：单进程+无锁 = 导致超卖的错误示范
-     * @url curl -X POST --data "seckillId=1000" http://localhost:8001/secKill/singleProcess/noLock
-     * @param seckillId
+     * QPS 设置
+     */
+    private static final int skillNum = 10;
+
+    /**
+     * 倒计数锁存器
+     */
+    private final CountDownLatch latch = new CountDownLatch(skillNum);
+
+
+    /**
+     * 秒杀1：单进程+无锁 = 导致超卖的错误示范
+     *
+     * @param secKillId
      * @return
+     * @url curl -X POST --data "secKillId=1000" http://localhost:8001/secKill/singleProcess/noLock
      */
     @PostMapping("/singleProcess/noLock")
-    public Result start(long seckillId) {
-        int skillNum = 10;
-        final CountDownLatch latch = new CountDownLatch(skillNum);
+    public Result start(final long secKillId) {
         // 删除秒杀售卖商品记录
-        secKillService.deleteSecKill(seckillId);
-        final long killId = seckillId;
+        clearSecKillRecord(secKillId);
         log.info("开始秒杀一(会出现超卖)");
         // 十个线程一起抢
         for (int i = 0; i < skillNum; i++) {
@@ -51,7 +59,7 @@ public class SimpleSecKillController {
             Runnable task = () -> {
                 // 坏蛋说 抛异常影响最终效果
                 try {
-                    Result result = secKillService.startSecKill(killId, userId);
+                    Result result = secKillService.startSecKill(secKillId, userId);
                     if (result != null) {
                         log.info("用户:{}{}", userId, result.get("msg"));
                     } else {
@@ -66,7 +74,91 @@ public class SimpleSecKillController {
         }
         try {
             latch.await();// 等待所有人任务结束
-            Long seckillCount = secKillService.getSecKillCount(seckillId);
+            Long seckillCount = secKillService.getSecKillCount(secKillId);
+            log.info("一共秒杀出{}件商品", seckillCount);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return Result.ok("秒杀测试完成");
+    }
+
+    /**
+     * 秒杀2：单进程+线程锁 解决超买问题
+     *
+     * @param secKillId
+     * @return
+     * @url curl -X POST --data "secKillId=1000" http://localhost:8001/secKill/singleProcess/hasLock
+     */
+    @PostMapping("/singleProcess/hasLock")
+    public Result startByLock(long secKillId) {
+        // 删除秒杀售卖商品记录
+        clearSecKillRecord(secKillId);
+        final long killId = secKillId;
+        log.info("开始秒杀一(解决超买问题)");
+        // 十个线程 一起抢
+        for (int i = 0; i < skillNum; i++) {
+            final long userId = i;
+            Runnable task = () -> {
+                // 坏蛋说 抛异常影响最终效果
+                try {
+                    Result result = secKillService.startSecKillByThreadLock(killId, userId);
+                    if (result != null) {
+                        log.info("用户:{}{}", userId, result.get("msg"));
+                    } else {
+                        log.info("用户:{}{}", userId, "哎呦喂，人也太多了，请稍后！");
+                    }
+                } catch (RrException e) {
+                    log.error("哎呀报错了{}", e.getMsg());
+                }
+                latch.countDown();
+            };
+            threadPoolExecutor.execute(task);
+        }
+        try {
+            latch.await();// 等待所有人任务结束
+            Long seckillCount = secKillService.getSecKillCount(secKillId);
+            log.info("一共秒杀出{}件商品", seckillCount);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return Result.ok("秒杀测试完成");
+    }
+
+    /**
+     * 秒杀2.1：单进程+线程锁 解决超买问题
+     *
+     * @param secKillId
+     * @return
+     * @url curl -X POST --data "secKillId=1000" http://localhost:8001/secKill/singleProcess/hasLockWithAop
+     */
+    @PostMapping("/singleProcess/hasLockWithAop")
+    public Result startByLockWithAop(long secKillId) {
+        // 删除秒杀售卖商品记录
+        clearSecKillRecord(secKillId);
+        final long killId = secKillId;
+        log.info("开始秒杀一(解决超买问题)");
+        // 十个线程 一起抢
+        for (int i = 0; i < skillNum; i++) {
+            final long userId = i;
+            Runnable task = () -> {
+                // 坏蛋说 抛异常影响最终效果
+                try {
+                    Result result = secKillService.startSecKillByThreadLockWithAop(killId, userId);
+                    if (result != null) {
+                        log.info("用户:{}{}", userId, result.get("msg"));
+                    } else {
+                        log.info("用户:{}{}", userId, "哎呦喂，人也太多了，请稍后！");
+                    }
+                } catch (RrException e) {
+                    log.error("哎呀报错了{}", e.getMsg());
+                }
+                latch.countDown();
+            };
+            threadPoolExecutor.execute(task);
+        }
+        try {
+            latch.await();// 等待所有人任务结束
+            Long seckillCount = secKillService.getSecKillCount(secKillId);
             log.info("一共秒杀出{}件商品", seckillCount);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -75,5 +167,9 @@ public class SimpleSecKillController {
     }
 
 
+
+    private void clearSecKillRecord(long secKillId) {
+        secKillService.deleteSecKill(secKillId);
+    }
 
 }

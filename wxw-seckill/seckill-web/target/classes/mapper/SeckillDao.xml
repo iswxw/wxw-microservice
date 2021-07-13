@@ -11,15 +11,17 @@
     <result column="version" jdbcType="INTEGER" property="version" />
   </resultMap>
 
+  <select id="queryNumberBySeckill" resultType="java.lang.Long">
+    SELECT number FROM `seckill-test`.t_sec_kill WHERE seckill_id=#{killId}
+   /* for update*/
+   lock in share mode
+  </select>
   <update id="updateNumberBySecKillId">
     UPDATE `seckill-test`.t_sec_kill SET number = 5 WHERE seckill_id= #{secKillId}
   </update>
+  <!--普通的更新库存-->
   <update id="updateNumberByKillId">
-    UPDATE `seckill-test`.t_sec_kill SET number= number - 1 WHERE seckill_id = #{killId}
+    UPDATE `seckill-test`.t_sec_kill SET number = number - 1 WHERE seckill_id = #{killId}
   </update>
-
-  <select id="queryNumberBySeckill" resultType="java.lang.Long">
-      SELECT number FROM `seckill-test`.t_sec_kill WHERE seckill_id=#{killId}
-    </select>
 
 </mapper>
