@@ -13,8 +13,9 @@
 
   <select id="queryNumberBySeckill" resultType="java.lang.Long">
     SELECT number FROM `seckill-test`.t_sec_kill WHERE seckill_id=#{killId}
-   /* for update*/
-   lock in share mode
+  </select>
+  <select id="queryNumberBySeckillAndPessimistic" resultType="java.lang.Long">
+    SELECT number FROM `seckill-test`.t_sec_kill WHERE seckill_id=#{killId} for update
   </select>
   <update id="updateNumberBySecKillId">
     UPDATE `seckill-test`.t_sec_kill SET number = 5 WHERE seckill_id= #{secKillId}
@@ -22,6 +23,19 @@
   <!--普通的更新库存-->
   <update id="updateNumberByKillId">
     UPDATE `seckill-test`.t_sec_kill SET number = number - 1 WHERE seckill_id = #{killId}
+  </update>
+  <!--悲观锁 更新库存的同时 也校验库存-->
+  <update id="updateNumberByKillIdAndNumber">
+    UPDATE `seckill-test`.t_sec_kill SET number = number - 1 WHERE seckill_id = #{killId} and number > 0
+  </update>
+  <!--乐观锁 通过版本维护 扣减库存操作-->
+  <update id="updateStockNumberByVersion">
+    UPDATE `seckill-test`.t_sec_kill
+    SET number=number-#{number}, version=version+1
+    WHERE seckill_id=#{killId} AND version = #{version}
+  </update>
+  <update id="updateVersionBySecKillId">
+    UPDATE `seckill-test`.t_sec_kill SET version = 0 WHERE seckill_id= #{secKillId}
   </update>
 
 </mapper>

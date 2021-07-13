@@ -34,6 +34,31 @@ public interface SecKillService {
     Result startSecKillByThreadLockWithAop(long killId, long userId);
 
     /**
+     * 秒杀3、数据库悲观锁
+     * @param killId
+     * @param userId
+     * @return
+     */
+    Result startSecKillByThreadLockWithPessimistic(long killId, long userId);
+
+    /**
+     * 秒杀3.1、数据库悲观锁
+     * @param killId
+     * @param userId
+     * @return 单用户抢购一件商品没有问题、但是抢购多件商品不建议这种写法 UPDATE锁表
+     */
+    Result startSecKillByThreadLockWithPessimistic01(long killId, long userId);
+
+    /**
+     * 数据库乐观锁 单用户抢购一件商品没有问题、但是抢购多件商品不建议这种写法 UPDATE锁表
+     * @param killId
+     * @param userId
+     * @param number 单个用户秒杀商品数量
+     * @return
+     */
+    Result startSecKillByThreadLockWithOptisimistic(long killId, long userId, int number);
+
+    /**
      * 获取秒杀的数量
      * @param secKillId
      * @return
@@ -45,4 +70,10 @@ public interface SecKillService {
      * @param secKillId
      */
     void deleteSecKill(long secKillId);
+
+    /**
+     * 版本重置
+     * @param secKillId
+     */
+    void updateVersionBySecKillId(long secKillId);
 }
