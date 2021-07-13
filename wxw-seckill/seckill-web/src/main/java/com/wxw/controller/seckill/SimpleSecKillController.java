@@ -21,7 +21,7 @@ import java.util.concurrent.CountDownLatch;
  */
 @Slf4j
 @RestController
-@RequestMapping("/sec-kill")
+@RequestMapping("/secKill")
 public class SimpleSecKillController {
 
     @Resource
@@ -30,14 +30,14 @@ public class SimpleSecKillController {
     @Resource
     private SecKillService secKillService;
 
-
     /**
-     * 秒杀一：无锁-存在超买问题-单进程
-     * @url curl -X POST --data "seckillId=1000" http://localhost:8001/sec-kill/no-lock
+     * 下单接口
+     * 秒杀一：单进程+无锁 = 导致超卖的错误示范
+     * @url curl -X POST --data "seckillId=1000" http://localhost:8001/secKill/singleProcess/noLock
      * @param seckillId
      * @return
      */
-    @PostMapping("/no-lock")
+    @PostMapping("/singleProcess/noLock")
     public Result start(long seckillId) {
         int skillNum = 10;
         final CountDownLatch latch = new CountDownLatch(skillNum);
@@ -73,6 +73,7 @@ public class SimpleSecKillController {
         }
         return Result.ok("秒杀测试完成");
     }
+
 
 
 }
