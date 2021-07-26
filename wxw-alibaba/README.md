@@ -54,13 +54,114 @@ cd nacos-docker
 docker-compose -f example/standalone-derby.yaml up
 ```
 
-- 注意： Mac 和Wins docker desktop 已经帮我们集成了 `docker-compose` 所以我们可以通过yaml的形式直接使用
+`standalone-derby.yaml` 内容如下：
 
-  ```bash
-  ## 通过一下方式可以检查 docker-compose 版本或者是否安装
-  mac@wxw example % docker-compose -v
-  docker-compose version 1.28.5, build c4eb3a1f
+```
+version: "2"
+services:
+  nacos:
+    image: nacos/nacos-server:${NACOS_VERSION}
+    container_name: nacos-standalone
+    environment:
+    - PREFER_HOST_MODE=hostname
+    - MODE=standalone
+    volumes:
+    - ./standalone-logs/:/home/nacos/logs
+    - ./init.d/custom.properties:/home/nacos/init.d/custom.properties
+    ports:
+    - "8848:8848"
+    - "9848:9848"
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus/prometheus-standalone.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - nacos
+    restart: on-failure
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    restart: on-failure
+```
+
+从上面文件我们也可以看出启动yaml文件中配置nacos的日志存储目录，初始化文件：`custom.properties` 和 prometheus 的配置策略文件`prometheus.yml` 
+
+- 初始化文件：`custom.properties` 
+
+  ```properties
+  ## 主要是可以配置的暴露检查点
+  #spring.security.enabled=false
+  #management.security=false
+  #security.basic.enabled=false
+  #nacos.security.ignore.urls=/**
+  #management.metrics.export.elastic.host=http://localhost:9200
+  # metrics for prometheus
+  management.endpoints.web.exposure.include=*
+  
+  # metrics for elastic search
+  #management.metrics.export.elastic.enabled=false
+  #management.metrics.export.elastic.host=http://localhost:9200
+  
+  # metrics for influx
+  #management.metrics.export.influx.enabled=false
+  #management.metrics.export.influx.db=springboot
+  #management.metrics.export.influx.uri=http://localhost:8086
+  #management.metrics.export.influx.auto-create-db=true
+  #management.metrics.export.influx.consistency=one
+  #management.metrics.export.influx.compressed=true
   ```
+
+- prometheus 的配置策略文件`prometheus-standalone.yaml`  
+
+  ```yaml
+  # my global config
+  global:
+    scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+    evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+    # scrape_timeout is set to the global default (10s).
+  
+  # Alertmanager configuration
+  alerting:
+    alertmanagers:
+      - static_configs:
+          - targets:
+            # - alertmanager:9093
+  
+  # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+  rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+  
+  # A scrape configuration containing exactly one endpoint to scrape:
+  # Here it's Prometheus itself.
+  scrape_configs:
+    # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+    - job_name: 'prometheus'
+  
+      # metrics_path defaults to '/metrics'
+      # scheme defaults to 'http'.
+  
+      static_configs:
+        - targets: ['localhost:9090']
+  
+    - job_name: 'nacos'
+      metrics_path: '/nacos/actuator/prometheus'
+      static_configs:
+        - targets: ['nacos:8848']
+  ```
+
+注意： Mac 和Wins docker desktop 已经帮我们集成了 `docker-compose` 所以我们可以通过yaml的形式直接使用
+
+```bash
+## 通过一下方式可以检查 docker-compose 版本或者是否安装
+mac@wxw example % docker-compose -v
+docker-compose version 1.28.5, build c4eb3a1f
+```
 
 查看docker 启动的应用容器
 
