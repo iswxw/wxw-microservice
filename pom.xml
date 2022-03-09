@@ -10,6 +10,8 @@
     <modules>
         <module>wxw-alibaba</module>
         <module>wxw-seckill</module>
+        <module>wxw-docker</module>
+        <module>wxw-docker-compose</module>
     </modules>
     <packaging>pom</packaging>
     <!--项目名称和主页，maven产生的文档用-->
